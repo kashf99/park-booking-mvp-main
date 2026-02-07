@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: park-booking-backend
+    restart: unless-stopped           # Auto-restart on failure
+    ports:
+      - "4000:4000"
+    env_file: .env
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - .:/usr/src/app                 # Mount local code
+      - /usr/src/app/node_modules      # Protect container node_modules
+    command: npm run dev               # Nodemon for hot reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mongo:
+    image: mongo:6
+    container_name: park-booking-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: park-booking
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: park-booking-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo_data:
