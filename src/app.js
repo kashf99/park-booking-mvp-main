@@ -9,6 +9,7 @@ const bullBoardAdapter = require('./config/bullBoard');
 // Route imports
 const attractionRoutes = require("./routes/attraction.routes");
 const bookingRoutes = require("./routes/booking.routes");
+const userRoutes = require("./routes/user.routes");
 
 const app = express();
 
@@ -89,6 +90,16 @@ if (process.env.NODE_ENV !== "test") {
     morgan(":method :url :status :response-time ms - :res[content-length]")
   );
 }
+
+// Lightweight request/response logger to debug status codes coming via tunnels/clients
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    console.log(
+      `[REQ] ${req.method} ${req.originalUrl} Accept=${req.headers.accept || "*/*"} UA=${req.headers["user-agent"] || ""} -> ${res.statusCode}`
+    );
+  });
+  next();
+});
 
 
 // Start the email worker
@@ -203,6 +214,7 @@ app.get("/metrics", (req, res) => {
 // ============================
 app.use("/api/attractions", attractionRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/users", userRoutes);
 
 // ============================
 // 404 HANDLER

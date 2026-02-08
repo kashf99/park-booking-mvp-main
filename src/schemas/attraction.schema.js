@@ -1,16 +1,16 @@
 const Joi = require('joi');
 
 // Common reusable schemas
-// const timingsSchema = Joi.object({
-//   opening: Joi.string()
-//     .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-//     .message('Opening time must be in HH:MM format (24-hour)')
-//     .required(),
-//   closing: Joi.string()
-//     .pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
-//     .message('Closing time must be in HH:MM format (24-hour)')
-//     .required()
-// });
+const timingsSchema = Joi.object({
+  opening: Joi.string()
+    .pattern(/^((0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM))$/i)
+    .message('Opening time must be in hh:mm AM/PM format')
+    .required(),
+  closing: Joi.string()
+    .pattern(/^((0?[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM))$/i)
+    .message('Closing time must be in hh:mm AM/PM format')
+    .required()
+});
 
 // Create Attraction Schema
 const createAttractionSchema = Joi.object({
@@ -35,6 +35,8 @@ const createAttractionSchema = Joi.object({
     .max(200)
     .optional()
     .default(''),
+
+  timings: timingsSchema.optional(),
 
   // ✅ FIXED: Changed from pricePerPerson to ticketPrice
   ticketPrice: Joi.number()
@@ -86,8 +88,8 @@ const updateAttractionSchema = Joi.object({
     .max(200)
     .optional(),
 
-//   timings: timingsSchema
-//     .optional(),
+  timings: timingsSchema
+    .optional(),
 
   ticketPrice: Joi.number()
     .min(0)

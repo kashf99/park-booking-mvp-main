@@ -110,14 +110,15 @@ exports.getAllAttractions = async (req, res) => {
       sortBy = 'createdAt', 
       sortOrder = 'desc',
       search,
-    //   isActive = true
+      isActive = 'true'
     } = req.query;
     
     // Build query
     const query = {};
-    // if (isActive !== undefined) {
-    //   query.isActive = isActive === 'true';
-    // }
+    // Default to only active attractions; allow ?isActive=false to fetch all inactive
+    if (isActive !== undefined) {
+      query.isActive = isActive === 'true';
+    }
     
     if (search) {
       query.$or = [

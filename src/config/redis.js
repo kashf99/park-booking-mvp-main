@@ -59,6 +59,25 @@ class RedisClient {
     }
   }
 
+  async healthCheck() {
+    // If Redis is disabled or failed to connect, treat as healthy in mock mode
+    if (!this.client || this.client.isMock) {
+      return { healthy: true, mode: 'mock' };
+    }
+
+    try {
+      const start = Date.now();
+      const pong = await this.client.ping();
+      return {
+        healthy: pong === 'PONG',
+        latencyMs: Date.now() - start,
+        mode: 'live'
+      };
+    } catch (error) {
+      return { healthy: false, error: error.message };
+    }
+  }
+
   /** 
    * This is the method BullMQ expects to get a connection object
    */
