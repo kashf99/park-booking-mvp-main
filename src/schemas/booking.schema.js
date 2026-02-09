@@ -21,7 +21,8 @@ const bookingSchemas = {
   validateQRCode: Joi.object({
     bookingId: Joi.string().required(),
     visitorEmail: Joi.string().email().required(),
-    hash: Joi.string().required()
+    hash: Joi.string().required(),
+    qrToken: Joi.string().optional()
   }),
 
   // Get visitor bookings (email or phone)
